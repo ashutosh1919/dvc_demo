@@ -1,0 +1,40 @@
+stages:
+  prepare:
+    cmd: python3 src/prepare.py data/data.xml
+    deps:
+    - data/data.xml
+    - src/prepare.py
+    params:
+    - prepare.seed
+    - prepare.split
+    outs:
+    - data/prepared
+  featurize:
+    cmd: python3 src/featurization.py data/prepared data/features
+    deps:
+    - data/prepared
+    - src/featurization.py
+    params:
+    - featurize.max_features
+    - featurize.ngrams
+    outs:
+    - data/features
+  train:
+    cmd: python3 src/train.py data/features model.pkl
+    deps:
+    - data/features
+    - src/train.py
+    params:
+    - train.n_estimators
+    - train.seed
+    outs:
+    - model.pkl
+  evaluate:
+    cmd: python3 src/evaluate.py model.pkl data/features/ scores.json prt.json
+    deps:
+    - data/features/test.pkl
+    - model.pkl
+    - src/evaluate.py
+    outs:
+    - prt.json
+    - scores.json

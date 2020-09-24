@@ -1,0 +1,4 @@
+.dvc/
+/model.pkl
+/scores.json
+/prt.json

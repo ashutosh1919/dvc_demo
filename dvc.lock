@@ -1,0 +1,56 @@
+prepare:
+  cmd: python3 src/prepare.py data/data.xml
+  deps:
+  - path: data/data.xml
+    md5: a304afb96060aad90176268345e10355
+  - path: src/prepare.py
+    md5: 781ba75e42dd4f116bf69feaf6398589
+  params:
+    params.yaml:
+      prepare.seed: 20170428
+      prepare.split: 0.2
+  outs:
+  - path: data/prepared
+    md5: 20b786b6e6f80e2b3fcf17827ad18597.dir
+featurize:
+  cmd: python3 src/featurization.py data/prepared data/features
+  deps:
+  - path: data/prepared
+    md5: 20b786b6e6f80e2b3fcf17827ad18597.dir
+  - path: src/featurization.py
+    md5: 02180903aa05599ceaa6ff6ee2471d00
+  params:
+    params.yaml:
+      featurize.max_features: 500
+      featurize.ngrams: 1
+  outs:
+  - path: data/features
+    md5: 7fd2f827edc8bd4981b43f878253cdd1.dir
+train:
+  cmd: python3 src/train.py data/features model.pkl
+  deps:
+  - path: data/features
+    md5: 7fd2f827edc8bd4981b43f878253cdd1.dir
+  - path: src/train.py
+    md5: ad8e71b2cca4334a7d3bb6495645068c
+  params:
+    params.yaml:
+      train.n_estimators: 50
+      train.seed: 20170428
+  outs:
+  - path: model.pkl
+    md5: c4c067076a008802a8adc1881b870dec
+evaluate:
+  cmd: python3 src/evaluate.py model.pkl data/features/ scores.json prt.json
+  deps:
+  - path: data/features/test.pkl
+    md5: cdee072a44449b08def1015317d74db4
+  - path: model.pkl
+    md5: c4c067076a008802a8adc1881b870dec
+  - path: src/evaluate.py
+    md5: 631fd3f13434edcf4abd56a5b798e8b2
+  outs:
+  - path: prt.json
+    md5: cd433c034acfa2ebd5679a3838b65c7c
+  - path: scores.json
+    md5: 06df1f4765480cd62052eab00517a8d2
